@@ -8,8 +8,22 @@ const taskRoutes = require('./routes/taskRoutes');
 
 const app = express();
 
+// Allowed origins: comma-separated CLIENT_URL list + localhost dev.
+// Any *.vercel.app subdomain is also allowed so Vercel preview deploys work.
+const allowedOrigins = (process.env.CLIENT_URL || 'http://localhost:5173')
+  .split(',')
+  .map((o) => o.trim())
+  .filter(Boolean);
+
 app.use(cors({
-  origin: process.env.CLIENT_URL || 'http://localhost:5173',
+  origin: (origin, callback) => {
+    // Allow non-browser clients (curl, server-to-server) with no Origin header
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.includes(origin) || /\.vercel\.app$/.test(new URL(origin).hostname)) {
+      return callback(null, true);
+    }
+    return callback(new Error(`Origin ${origin} not allowed by CORS`));
+  },
   credentials: true,
 }));
 
