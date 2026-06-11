@@ -26,7 +26,13 @@ export default function TaskBoardPage() {
     const socket = connectSocket(token);
     joinProject(projectId);
 
-    socket.on('connect', () => setConnected(true));
+    // Socket may already be connected (e.g. opened at login), so the 'connect'
+    // event won't fire again — seed the indicator from the current state.
+    setConnected(socket.connected);
+    socket.on('connect', () => {
+      setConnected(true);
+      joinProject(projectId); // re-join room after a reconnect
+    });
     socket.on('disconnect', () => setConnected(false));
 
     // Apply real-time task events emitted by the server
