@@ -38,5 +38,11 @@ export const useProjectStore = create((set) => ({
     set((state) => ({ projects: state.projects.filter((p) => p._id !== id) }));
   },
 
+  addMemberByEmail: async (projectId, email) => {
+    const { data } = await api.post(`/projects/${projectId}/members`, { email });
+    set({ currentProject: data.project });
+    return data.project;
+  },
+
   clearCurrentProject: () => set({ currentProject: null }),
 }));

@@ -47,7 +47,10 @@ const remove = async (req, res, next) => {
 
 const addMember = async (req, res, next) => {
   try {
-    const project = await projectService.addMember(req.params.id, req.user._id, req.body.memberId);
+    const project = await projectService.addMember(req.params.id, req.user._id, {
+      email: req.body.email,
+      memberId: req.body.memberId,
+    });
     res.json({ success: true, project });
   } catch (err) {
     next(err);

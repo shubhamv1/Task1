@@ -5,7 +5,8 @@ import { useProjectStore } from '../store/projectStore';
 import { useAuthStore } from '../store/authStore';
 import TaskColumn from '../components/TaskColumn';
 import CreateTaskModal from '../components/CreateTaskModal';
-import { connectSocket, joinProject, leaveProject, getSocket } from '../services/socket';
+import MembersModal from '../components/MembersModal';
+import { connectSocket, joinProject, leaveProject } from '../services/socket';
 
 const STATUSES = ['todo', 'in-progress', 'done'];
 
@@ -16,6 +17,7 @@ export default function TaskBoardPage() {
   const { currentProject, fetchProject } = useProjectStore();
   const { token } = useAuthStore();
   const [showModal, setShowModal] = useState(false);
+  const [showMembers, setShowMembers] = useState(false);
   const [connected, setConnected] = useState(false);
 
   useEffect(() => {
@@ -72,6 +74,9 @@ export default function TaskBoardPage() {
             <span className={`w-2 h-2 rounded-full ${connected ? 'bg-green-500 animate-pulse' : 'bg-gray-300'}`} />
             {connected ? 'Live' : 'Connecting...'}
           </span>
+          <button onClick={() => setShowMembers(true)} className="btn-secondary text-sm py-1.5">
+            Members{currentProject?.members ? ` (${currentProject.members.length})` : ''}
+          </button>
           <button onClick={() => setShowModal(true)} className="btn-primary text-sm py-1.5">
             + Add Task
           </button>
@@ -95,6 +100,9 @@ export default function TaskBoardPage() {
 
       {showModal && (
         <CreateTaskModal projectId={projectId} onClose={() => setShowModal(false)} />
+      )}
+      {showMembers && currentProject && (
+        <MembersModal project={currentProject} onClose={() => setShowMembers(false)} />
       )}
     </div>
   );
